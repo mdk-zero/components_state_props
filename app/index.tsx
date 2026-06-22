@@ -1,74 +1,114 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import CounterDisplay from "../components/CounterDisplay";
 import { useState } from "react";
+
+const NEON_PINK = "#ff00ff";
 
 export default function Index() {
   const [count, setCount] = useState(0);
 
-  const addCount = () => setCount((prev) => prev + 1);
+  const MAX_COUNT_FOR_3X_SPEED = 200;
+  const addCount = () => setCount((prev) => Math.min(prev + 1, MAX_COUNT_FOR_3X_SPEED));
   const minusCount = () => setCount((prev) => prev - 1);
   const resetCount = () => setCount(0);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.parentContainer}>
-        <Text style={styles.textParent}>PARENT COMPONENT (index.tsx)</Text>
-        <Text style={styles.parentHeader}>This is the parent screen</Text>
-        <View style={styles.stateLocker}>
-          <Text style={{ color: "#fff", fontWeight: "bold" }}>STATE LOCKER</Text>
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>count: {count}</Text>
+    <LinearGradient colors={["#0f0c29", "#302b63", "#24243e"]} style={styles.gradient}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.parentContainer}>
+          <View style={styles.labelBadge}>
+            <Text style={styles.labelText}>PARENT COMPONENT (index.tsx)</Text>
+          </View>
+
+          <Text style={styles.title}>RICK ROLL COUNTER</Text>
+          <Text style={styles.subtitle}>Never gonna count you down</Text>
+
+          <View style={styles.stateLocker}>
+            <Text style={styles.stateLockerTitle}>STATE LOCKER</Text>
+            <Text style={styles.stateLockerCount}>count: {count}</Text>
+          </View>
+
+          <CounterDisplay
+            count={count}
+            onAdd={addCount}
+            onMinus={minusCount}
+            onReset={resetCount}
+          />
         </View>
-        <CounterDisplay count={count} onAdd={addCount} onMinus={minusCount} onReset={resetCount} />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
-    paddingVertical: 200,
+    paddingHorizontal: 16,
+    paddingVertical: 120,
   },
   parentContainer: {
     width: "100%",
-    height: "100%",
-    borderWidth: 1,
-    borderColor: "orange",
-    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: NEON_PINK,
+    borderRadius: 32,
+    backgroundColor: "rgba(255, 0, 255, 0.12)",
     flexDirection: "column",
     alignItems: "center",
-    gap: 10,
-    padding: 20,
+    gap: 16,
+    padding: 24,
   },
-  textParent: {
+  labelBadge: {
     alignSelf: "center",
-    textAlign: "center",
-    transform: [{ translateY: -10 }],
-    backgroundColor: "orange",
-    width: "auto",
-    paddingHorizontal: 20,
-    paddingVertical: 5,
+    backgroundColor: NEON_PINK,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: -36,
+  },
+  labelText: {
     color: "#fff",
-    fontWeight: "bold",
-    borderRadius: 10,
-    gap: 10,
-    marginTop: -20,
+    fontWeight: "900",
+    fontSize: 12,
+    letterSpacing: 0.5,
   },
-  parentHeader: {
-    alignSelf: "center",
-    fontSize: 18,
-    fontWeight: "600",
+  title: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#fff",
+    textAlign: "center",
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: -10,
+    fontStyle: "italic",
   },
   stateLocker: {
-    backgroundColor: "limegreen",
-    width: 200,
-    paddingVertical: 10,
-    borderRadius: 10,
+    width: "100%",
+    backgroundColor: "rgba(34, 197, 94, 0.2)",
+    borderWidth: 2,
+    borderColor: "#22c55e",
+    borderRadius: 16,
+    paddingVertical: 12,
     alignItems: "center",
-    marginBottom: 20,
+  },
+  stateLockerTitle: {
+    color: "#22c55e",
+    fontWeight: "900",
+    fontSize: 12,
+    letterSpacing: 1,
+  },
+  stateLockerCount: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginTop: 2,
   },
 });

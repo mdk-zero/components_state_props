@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
   StyleProp,
+  Animated,
 } from "react-native";
 import { IconSymbol } from "./ui/icon-symbol";
 
@@ -18,9 +19,15 @@ type CounterButtonProps = {
 };
 
 const variantColors: Record<CounterButtonVariant, string> = {
-  add: "#22c55e",
-  minus: "#ef4444",
-  reset: "#6b7280",
+  add: "#39ff14",
+  minus: "#ff3131",
+  reset: "#00ffff",
+};
+
+const variantBg: Record<CounterButtonVariant, string> = {
+  add: "rgba(57, 255, 20, 0.25)",
+  minus: "rgba(255, 49, 49, 0.25)",
+  reset: "rgba(0, 255, 255, 0.25)",
 };
 
 const variantIcons: Record<
@@ -43,6 +50,7 @@ export const CounterButton = ({
 }: CounterButtonProps) => {
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const repeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const clearTimers = () => {
     if (pressTimerRef.current) {
@@ -55,7 +63,23 @@ export const CounterButton = ({
     }
   };
 
+  const animatePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.92,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const handlePressIn = () => {
+    animatePress();
     onPress();
     pressTimerRef.current = setTimeout(() => {
       repeatTimerRef.current = setInterval(() => {
@@ -72,49 +96,54 @@ export const CounterButton = ({
     return () => clearTimers();
   }, []);
 
+  const color = variantColors[variant];
+  const bg = variantBg[variant];
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[
-        styles.button,
-        { backgroundColor: variantColors[variant] },
-        style,
-      ]}>
-      <IconSymbol
-        name={variantIcons[variant]}
-        size={label ? 20 : 22}
-        color="#fff"
-        style={styles.icon}
-      />
-      {label ? <Text style={styles.label}>{label}</Text> : null}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }], flex: style ? 1 : 0 }}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[
+          styles.button,
+          {
+            backgroundColor: bg,
+            borderColor: color,
+          },
+          style,
+        ]}>
+        <IconSymbol
+          name={variantIcons[variant]}
+          size={label ? 20 : 24}
+          color={color}
+          style={styles.icon}
+        />
+        {label ? (
+          <Text style={[styles.label, { color }]}>{label}</Text>
+        ) : null}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    paddingVertical: 16,
+    paddingHorizontal: 22,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 4,
+    borderWidth: 2,
   },
   icon: {
     marginTop: 1,
   },
   label: {
-    color: "#fff",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 0.5,
   },
 });

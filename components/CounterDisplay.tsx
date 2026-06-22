@@ -12,10 +12,12 @@ type CounterDisplayProps = {
 };
 
 const SPEED_FACTOR = 0.01;
-// Keep rate inside the documented expo-video range; 0 is avoided because some
-// players freeze/crash when playbackRate is set to exactly 0.
 const MIN_RATE = 0.05;
-const MAX_RATE = 16;
+const MAX_RATE = 3;
+
+const NEON_PINK = "#ff00ff";
+const NEON_CYAN = "#00ffff";
+const NEON_GOLD = "#fbbf24";
 
 const CounterDisplay = ({ count, onAdd, onMinus, onReset }: CounterDisplayProps) => {
   const targetRate = Math.min(Math.max(1 + count * SPEED_FACTOR, MIN_RATE), MAX_RATE);
@@ -52,13 +54,22 @@ const CounterDisplay = ({ count, onAdd, onMinus, onReset }: CounterDisplayProps)
     player.playbackRate = targetRate;
   }, [targetRate, player, isReady]);
 
+  const speedLabel =
+    targetRate >= 2.5
+      ? "🔥 MAXIMUM RICK"
+      : targetRate >= 1.75
+        ? "⚡ HYPE RICK"
+        : targetRate >= 1.25
+          ? "💨 FAST RICK"
+          : "🕺 CHILL RICK";
+
   return (
     <View style={styles.childContainer}>
-      <Text style={styles.textChild}>CHILD COMPONENT (CounterDisplay)</Text>
-      <Text style={{ fontSize: 18, color: "gray", marginTop: -10 }}>
-        This is the Child Component
-      </Text>
-      <View style={styles.videoContainer}>
+      <View style={styles.labelBadge}>
+        <Text style={styles.labelText}>CHILD COMPONENT (CounterDisplay)</Text>
+      </View>
+
+      <View style={styles.videoFrame}>
         <VideoView
           player={player}
           style={styles.video}
@@ -66,12 +77,27 @@ const CounterDisplay = ({ count, onAdd, onMinus, onReset }: CounterDisplayProps)
           nativeControls={false}
         />
       </View>
+
+      <View style={styles.speedometer}>
+        <Text style={styles.speedValue}>{targetRate.toFixed(2)}×</Text>
+        <Text style={styles.speedLabel}>RICK VELOCITY</Text>
+        <View style={styles.speedBarTrack}>
+          <View
+            style={[
+              styles.speedBarFill,
+              { width: `${Math.min((targetRate / MAX_RATE) * 100, 100)}%` },
+            ]}
+          />
+        </View>
+        <Text style={styles.hypeLabel}>{speedLabel}</Text>
+      </View>
+
       <View style={styles.buttonGroup}>
         <View style={styles.row}>
           <CounterButton onPress={onAdd} variant="add" style={styles.flexButton} />
           <CounterButton onPress={onMinus} variant="minus" style={styles.flexButton} />
         </View>
-          <CounterButton label="Reset" onPress={handleReset} variant="reset" />
+        <CounterButton label="Reset" onPress={handleReset} variant="reset" />
       </View>
     </View>
   );
@@ -81,43 +107,88 @@ export default CounterDisplay;
 
 const styles = StyleSheet.create({
   childContainer: {
-    flex: 1,
     width: "100%",
-    borderWidth: 1,
-    borderColor: "blue",
-    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: NEON_CYAN,
+    borderRadius: 28,
+    backgroundColor: "rgba(0, 255, 255, 0.10)",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 10,
-    paddingBottom: 20,
+    gap: 14,
+    padding: 20,
+    paddingBottom: 24,
   },
-  textChild: {
+  labelBadge: {
     alignSelf: "center",
-    textAlign: "center",
-    transform: [{ translateY: -10 }],
-    backgroundColor: "blue",
-    width: "auto",
-    paddingHorizontal: 20,
+    backgroundColor: NEON_CYAN,
+    paddingHorizontal: 14,
     paddingVertical: 5,
-    color: "#fff",
-    fontWeight: "bold",
-    borderRadius: 10,
-    gap: 10,
+    borderRadius: 20,
+    marginTop: -32,
   },
-  videoContainer: {
-    width: "80%",
+  labelText: {
+    color: "#000",
+    fontWeight: "900",
+    fontSize: 11,
+    letterSpacing: 0.5,
+  },
+  videoFrame: {
+    width: "90%",
     aspectRatio: 16 / 9,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "#000",
+    borderWidth: 2,
+    borderColor: NEON_PINK,
   },
   video: {
     width: "100%",
     height: "100%",
   },
+  speedometer: {
+    width: "90%",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: NEON_CYAN,
+  },
+  speedValue: {
+    fontSize: 40,
+    fontWeight: "900",
+    color: NEON_GOLD,
+  },
+  speedLabel: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.7)",
+    fontWeight: "800",
+    letterSpacing: 1,
+    marginTop: -4,
+  },
+  speedBarTrack: {
+    width: "100%",
+    height: 10,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 5,
+    marginTop: 10,
+    overflow: "hidden",
+  },
+  speedBarFill: {
+    height: "100%",
+    backgroundColor: NEON_CYAN,
+  },
+  hypeLabel: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: "900",
+    color: NEON_PINK,
+    letterSpacing: 0.5,
+  },
   buttonGroup: {
-    width: "80%",
+    width: "90%",
     alignSelf: "center",
     gap: 12,
   },
