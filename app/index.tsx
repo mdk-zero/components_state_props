@@ -18,12 +18,7 @@ export default function Index() {
           <Text style={{ color: "#fff", fontWeight: "bold" }}>STATE LOCKER</Text>
           <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>count: {count}</Text>
         </View>
-        <CounterDisplay
-          count={count}
-          onAdd={addCount}
-          onMinus={minusCount}
-          onReset={resetCount}
-        />
+        <CounterDisplay count={count} onAdd={addCount} onMinus={minusCount} onReset={resetCount} />
       </View>
     </ScrollView>
   );

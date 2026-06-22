@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -31,16 +32,51 @@ const variantIcons: Record<
   reset: "arrow.counterclockwise",
 };
 
+const REPEAT_DELAY_MS = 250;
+const REPEAT_INTERVAL_MS = 120;
+
 export const CounterButton = ({
   label,
   onPress,
   variant = "add",
   style,
 }: CounterButtonProps) => {
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const repeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearTimers = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+    if (repeatTimerRef.current) {
+      clearInterval(repeatTimerRef.current);
+      repeatTimerRef.current = null;
+    }
+  };
+
+  const handlePressIn = () => {
+    onPress();
+    pressTimerRef.current = setTimeout(() => {
+      repeatTimerRef.current = setInterval(() => {
+        onPress();
+      }, REPEAT_INTERVAL_MS);
+    }, REPEAT_DELAY_MS);
+  };
+
+  const handlePressOut = () => {
+    clearTimers();
+  };
+
+  useEffect(() => {
+    return () => clearTimers();
+  }, []);
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={[
         styles.button,
         { backgroundColor: variantColors[variant] },
